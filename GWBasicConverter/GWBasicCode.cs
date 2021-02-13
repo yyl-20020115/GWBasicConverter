@@ -397,7 +397,7 @@ namespace GWBasicConverter
                     this.CheckBoundary(lines, data, pos, 2);
                     var hex = BitConverter.ToUInt16(data, pos + 1);
                     this.EnsureBufferSaved(builder, buffer, encoding);
-                    builder.AppendFormat("{0:X2}", hex);
+                    builder.AppendFormat("&H{0:X}", hex);
                     pos += 3;
                 }
                 else if (code == 0x0d) // line pointer (unsigned)

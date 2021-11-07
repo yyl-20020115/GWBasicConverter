@@ -300,14 +300,8 @@ namespace GWBasicConverter
                 }
             }
         }
-        protected string DecodeText(byte[] buffer, Encoding encoding)
-        {
-            return encoding.GetString(buffer);
-        }
-        protected string DecodeText(List<byte> buffer, Encoding encoding)
-        {
-            return this.DecodeText(buffer.ToArray(), encoding);
-        }
+        protected string DecodeText(byte[] buffer, Encoding encoding) => encoding.GetString(buffer);
+        protected string DecodeText(List<byte> buffer, Encoding encoding) => this.DecodeText(buffer.ToArray(), encoding);
         protected void EnsureBufferSaved(StringBuilder builder, List<byte> buffer, Encoding encoding)
         {
             if (buffer.Count > 0)
@@ -350,8 +344,11 @@ namespace GWBasicConverter
                     builder.Append('"');
                     pos++;
                 }
-                else if (code == 0x3a && !(isQuoting || isRemming) && data.Length - pos - 1 > 2
-                   && data[pos + 1] == 0x8f && data[pos + 2] == 0xd9)
+                else if (code == 0x3a 
+                    && !(isQuoting || isRemming) 
+                    && data.Length - pos - 1 > 2
+                    && data[pos + 1] == 0x8f 
+                    && data[pos + 2] == 0xd9)
                 {
                     // REM block starts
                     // A single quote is an alias for a REM instruction
@@ -402,7 +399,8 @@ namespace GWBasicConverter
                 }
                 else if (code == 0x0d) // line pointer (unsigned)
                 {
-                    throw new InvalidDataException("line pointer (0x0d) shouldn't occur in saved program.");
+                    throw new InvalidDataException(
+                        "line pointer (0x0d) shouldn't occur in saved program.");
                 }
                 else if (code == 0x0e) // line number (unsigned)
                 {
@@ -494,10 +492,10 @@ namespace GWBasicConverter
             if (stream == null) throw new ArgumentNullException(nameof(stream));
             if (!stream.CanRead ||!stream.CanSeek) throw new ArgumentException(nameof(stream));
             stream.Seek(0, SeekOrigin.Begin);
-            long l = stream.Length;
-            if (l>=int.MaxValue) throw new ArgumentOutOfRangeException(nameof(stream));
-            var data = new byte[l];
-            int r = stream.Read(data, 0, (int)l);
+            long len = stream.Length;
+            if (len>=int.MaxValue) throw new ArgumentOutOfRangeException(nameof(stream));
+            var data = new byte[len];
+            int r = stream.Read(data, 0, (int)len);
             
             return this.Parse(data, encoding);
         }

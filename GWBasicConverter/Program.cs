@@ -17,7 +17,7 @@ namespace GWBasicConverter
             {
                 using var input = new FileStream(args[0], FileMode.Open);
                 using var output = new StreamWriter(args[1]);
-                GWBasicCode code = new GWBasicCode();
+                var code = new GWBasicCodeGenerator();
                 try
                 {
                     var lines = code.Parse(input,Encoding.UTF8); //Encoding.GetEncoding(437)

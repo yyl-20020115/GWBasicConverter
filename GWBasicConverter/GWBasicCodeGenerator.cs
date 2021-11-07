@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace GWBasicConverter
 {
-    public class GWBasicCode
+    public class GWBasicCodeGenerator
     {
         public const byte MagicByte = 0xff;
         public static readonly Dictionary<int, string> Tokens = new Dictionary<int, string>

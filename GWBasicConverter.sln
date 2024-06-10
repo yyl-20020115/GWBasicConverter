@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30907.101
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.34928.147
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GWBasicConverter", "GWBasicConverter\GWBasicConverter.csproj", "{DCDF7930-C3EE-43FF-AA97-A48477A6FB6A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GWBasicConverter", "GWBasicConverter\GWBasicConverter.csproj", "{085ABFFC-F37F-432F-9335-75870C52AA64}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DCDF7930-C3EE-43FF-AA97-A48477A6FB6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DCDF7930-C3EE-43FF-AA97-A48477A6FB6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DCDF7930-C3EE-43FF-AA97-A48477A6FB6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DCDF7930-C3EE-43FF-AA97-A48477A6FB6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{085ABFFC-F37F-432F-9335-75870C52AA64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{085ABFFC-F37F-432F-9335-75870C52AA64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{085ABFFC-F37F-432F-9335-75870C52AA64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{085ABFFC-F37F-432F-9335-75870C52AA64}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

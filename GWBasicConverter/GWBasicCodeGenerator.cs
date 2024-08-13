@@ -222,7 +222,7 @@ public partial class GWBasicCodeGenerator
 
     // Float binary format: http://www.chebucto.ns.ca/~af380/GW-BASIC-tokens.html
     // Rounding and postfixes: https://www-user.tu-chemnitz.de/~heha/viewchm.php/hs/gwBasic.chm/Chapter6.html
-    protected string ParseFloat32(byte[] data,int pos)
+    protected static string ParseFloat32(byte[] data,int pos)
     {
         if (data[pos + 3] == 0) return "0";
         var exp = data[pos + 3] - 152;// -152 = -128 + -24 (24 because the significand is behind a decimal dot)
@@ -230,7 +230,7 @@ public partial class GWBasicCodeGenerator
 
         var nf = (data[pos + 2] & 0x80) != 0 ? -(float)(mantissa * Math.Pow(2.0, exp)) : +(float)(mantissa * Math.Pow(2.0, exp));
         // Must round to 6 significant figures (from 7) when displaying
-        string ns = this.CanonizeNumber(string.Format("{0:0.000000}",nf));
+        var ns = CanonizeNumber($"{nf:0.000000}");
         //If nothing indicates that this is a float, then add the "!" postfix
         if (ns.IndexOfAny(['.', 'E']) <0)
             ns += '!';
@@ -238,7 +238,7 @@ public partial class GWBasicCodeGenerator
     }
     // Double binary format: http://www.chebucto.ns.ca/~af380/GW-BASIC-tokens.html
     // Rounding and postfixes: https://www-user.tu-chemnitz.de/~heha/viewchm.php/hs/gwBasic.chm/Chapter6.html
-    protected string ParseFloat64(byte[] data, int pos)
+    protected static string ParseFloat64(byte[] data, int pos)
     {
         if (data[pos + 7] == 0) return "0";
         var exp = data[pos + 7] - 184;// -184 = -128 + -56 (56 because the significand is behind a decimal dot)
@@ -258,7 +258,7 @@ public partial class GWBasicCodeGenerator
 
         // Must round to 16 significant figures (from 17) when displaying
         // The exponent sign for doubles is 'D' instead of 'E'
-        var ns = this.CanonizeNumber(string.Format("{0:0.0000000000000000}", nf)).Replace('E','D');
+        var ns = CanonizeNumber($"{nf:0.0000000000000000}").Replace('E','D');
 
         // Doubles only get their postfix '#' when they don't contain the exponentiation letter 'D'
         if (ns.IndexOf('D') < 0)
@@ -266,47 +266,40 @@ public partial class GWBasicCodeGenerator
         return ns;
     }
 
-    protected string CanonizeNumber(string s)
-    {
-        if (string.IsNullOrEmpty(s)) return s;
-        //s = Canon1.Replace(s, @"\1.");
-        //s = Canon2.Replace(s, string.Empty);
-        return s.ToUpper();
-    }
+    protected static string CanonizeNumber(string s)
+        => string.IsNullOrEmpty(s) ? s : s.ToUpper();
+    //s = Canon1.Replace(s, @"\1.");//s = Canon2.Replace(s, string.Empty);
 
-    protected void CheckBoundary(List<string> lines,byte[] data, int pos,int required)
+    protected static void CheckBoundary(List<string> lines,byte[] data, int pos,int required)
     {
         if (data.Length - pos - 1 < required)
         {
-            if (lines.Count > 0)
+            throw lines.Count switch
             {
-                throw new Exception($"Unexpected end of file after line {lines.Count}.");
-            }
-            else
-            {
-                throw new Exception($"Unexpected end of file at byte position {pos}.");
-            }
+                > 0 => new Exception($"Unexpected end of file after line {lines.Count}."),
+                _ => new Exception($"Unexpected end of file at byte position {pos}."),
+            };
         }
     }
-    protected string DecodeText(byte[] buffer, Encoding encoding) => encoding.GetString(buffer);
-    protected string DecodeText(List<byte> buffer, Encoding encoding) => this.DecodeText(buffer.ToArray(), encoding);
-    protected void EnsureBufferSaved(StringBuilder builder, List<byte> buffer, Encoding encoding)
+    protected static string DecodeText(byte[] buffer, Encoding encoding) => encoding.GetString(buffer);
+    protected static string DecodeText(List<byte> buffer, Encoding encoding) => DecodeText(buffer.ToArray(), encoding);
+    protected static void EnsureBufferSaved(StringBuilder builder, List<byte> buffer, Encoding encoding)
     {
         if (buffer.Count > 0)
         {
-            builder.Append(this.DecodeText(buffer, encoding));
+            builder.Append(DecodeText(buffer, encoding));
             buffer.Clear();
         }
     }
-    protected int ParseLine(List<string> lines,byte[] data,int pos, Encoding encoding)
+    protected static int ParseLine(List<string> lines,byte[] data,int pos, Encoding encoding)
     {
-        this.CheckBoundary(lines, data, pos, 2);
+        CheckBoundary(lines, data, pos, 2);
 
         if (data[pos + 0] == 0 && data[pos + 1] == 0) return -1;
         var o = pos;
 
         pos += 2;
-        this.CheckBoundary(lines, data, pos, 2);
+        CheckBoundary(lines, data, pos, 2);
 
         var isRemming = false;
         var isQuoting = false;
@@ -320,7 +313,7 @@ public partial class GWBasicCodeGenerator
 
         while (data[pos] != 0)
         {
-            this.CheckBoundary(lines, data, pos, 1);
+            CheckBoundary(lines, data, pos, 1);
             var code = data[pos];
             var ext = (((int)code)<<8) | data[pos + 1];
             if (code == 0x22 && !isRemming)
@@ -328,7 +321,7 @@ public partial class GWBasicCodeGenerator
                 // There was no quote escaping. You had to use CHR$() to
                 // output a quote character.
                 isQuoting = !isQuoting;
-                this.EnsureBufferSaved(builder, buffer, encoding);
+                EnsureBufferSaved(builder, buffer, encoding);
                 builder.Append('"');
                 pos++;
             }
@@ -342,7 +335,7 @@ public partial class GWBasicCodeGenerator
                 // A single quote is an alias for a REM instruction
                 // It is stored with 3 bytes: 0x3a8fd9
                 isRemming = true;    // a REM block never ends (inside a line)
-                this.EnsureBufferSaved(builder, buffer, encoding);
+                EnsureBufferSaved(builder, buffer, encoding);
                 builder.Append('\'');
                 pos += 3;
             }
@@ -355,14 +348,14 @@ public partial class GWBasicCodeGenerator
             {
                 // REM block starts
                 isRemming = true; // a REM block never ends (inside a line)
-                this.EnsureBufferSaved(builder, buffer, encoding);
+                EnsureBufferSaved(builder, buffer, encoding);
                 builder.Append("REM");
                 pos++;
             }
             else if (code == 0x0b) //octal constant
             {
                 //Signed, but that's not visible in octal representation
-                this.CheckBoundary(lines, data, pos, 2);
+                CheckBoundary(lines, data, pos, 2);
                 List<string> os = [];
                 var oct = BitConverter.ToUInt16(data, pos + 1);
                 while (oct > 0)
@@ -372,16 +365,16 @@ public partial class GWBasicCodeGenerator
                 }
                 if (os.Count == 0) os.Add("0");
                 os.Reverse();
-                this.EnsureBufferSaved(builder, buffer, encoding);
+                EnsureBufferSaved(builder, buffer, encoding);
                 builder.Append(os.Aggregate("&0", (a, b) => a + b));
                 pos += 3;
             }
             else if (code == 0x0c) //hex constant
             {
                 //signed, but that's not visible in hexa representation
-                this.CheckBoundary(lines, data, pos, 2);
+                CheckBoundary(lines, data, pos, 2);
                 var hex = BitConverter.ToUInt16(data, pos + 1);
-                this.EnsureBufferSaved(builder, buffer, encoding);
+                EnsureBufferSaved(builder, buffer, encoding);
                 builder.AppendFormat("&H{0:X}", hex);
                 pos += 3;
             }
@@ -392,15 +385,15 @@ public partial class GWBasicCodeGenerator
             }
             else if (code == 0x0e) // line number (unsigned)
             {
-                this.CheckBoundary(lines, data, pos, 2);
+                CheckBoundary(lines, data, pos, 2);
                 var lineNumber = BitConverter.ToUInt16(data, pos + 1);
-                this.EnsureBufferSaved(builder, buffer, encoding);
+                EnsureBufferSaved(builder, buffer, encoding);
                 builder.AppendFormat("{0} ", lineNumber);
                 pos += 3;
             }
             else if (code == 0x0f) //one byte constant
             {
-                this.EnsureBufferSaved(builder, buffer, encoding);
+                EnsureBufferSaved(builder, buffer, encoding);
                 builder.AppendFormat("{0}", data[pos + 1]);
                 pos += 2;
             }
@@ -410,26 +403,26 @@ public partial class GWBasicCodeGenerator
             }
             else if (code >= 0x11 && code <= 0x1b) // Numbers from 0 to 10 have their own tokens
             {
-                this.EnsureBufferSaved(builder, buffer, encoding);
+                EnsureBufferSaved(builder, buffer, encoding);
                 builder.AppendFormat("{0}", code - 0x11);
                 pos++;
             }
             else if (code == 0x1c) //two byte integer constant (signed)
             {
-                this.CheckBoundary(lines, data, pos, 2);
+                CheckBoundary(lines, data, pos, 2);
                 var si = BitConverter.ToInt16(data, pos + 1);
 
-                this.EnsureBufferSaved(builder, buffer, encoding);
+                EnsureBufferSaved(builder, buffer, encoding);
                 builder.Append(si);
 
                 pos += 3;
             }
             else if (code == 0x1d) //four byte floating point constant
             {
-                this.CheckBoundary(lines, data, pos, 4);
-                var si = this.ParseFloat32(data, pos + 1);
+                CheckBoundary(lines, data, pos, 4);
+                var si = ParseFloat32(data, pos + 1);
 
-                this.EnsureBufferSaved(builder, buffer, encoding);
+                EnsureBufferSaved(builder, buffer, encoding);
                 builder.Append(si);
 
                 pos += 5;
@@ -440,24 +433,24 @@ public partial class GWBasicCodeGenerator
             }
             else if (code == 0x1f) //eight byte double value
             {
-                this.CheckBoundary(lines, data, pos, 8);
-                var si = this.ParseFloat64(data, pos + 1);
+                CheckBoundary(lines, data, pos, 8);
+                var si = ParseFloat64(data, pos + 1);
 
-                this.EnsureBufferSaved(builder, buffer, encoding);
+                EnsureBufferSaved(builder, buffer, encoding);
                 builder.Append(si);
 
                 pos += 9;
             }
             else if (Tokens.ContainsKey(code)) //1-byte tokens
-            {                    
-                this.EnsureBufferSaved(builder, buffer, encoding);
+            {
+                EnsureBufferSaved(builder, buffer, encoding);
                 builder.Append(Tokens[code]);
                 pos++;
             }
             else if (Tokens.TryGetValue(ext, out string? value)) //2-byte tokens
             {
                 //The boundary for that +1 is already checked at the beginning of the loop.
-                this.EnsureBufferSaved(builder, buffer, encoding);
+                EnsureBufferSaved(builder, buffer, encoding);
                 builder.Append(value);
                 pos += 2;
             }
@@ -468,7 +461,7 @@ public partial class GWBasicCodeGenerator
         }
         pos++;
 
-        this.EnsureBufferSaved(builder, buffer, encoding);
+        EnsureBufferSaved(builder, buffer, encoding);
 
         lines.Add(builder.ToString());
 
@@ -490,8 +483,8 @@ public partial class GWBasicCodeGenerator
     public List<string> Parse(byte[] data, Encoding? encoding = null)
     {
         encoding ??= Encoding.Default;
-        var lines = new List<string>(); 
-        if (data == null) throw new ArgumentNullException(nameof(data));
+        var lines = new List<string>();
+        ArgumentNullException.ThrowIfNull(data);
         if (data.Length == 0)
         {
             //OK    
@@ -505,7 +498,7 @@ public partial class GWBasicCodeGenerator
             var pos = 1;
             while (pos < data.Length - 1)
             {
-                var delta = this.ParseLine(lines, data, pos, encoding);
+                var delta = ParseLine(lines, data, pos, encoding);
                 if (delta < 0) break;
                 pos += delta;
             }

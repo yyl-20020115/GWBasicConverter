@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "GWBasicConverter": {
+      "commandName": "Project",
+      "commandLineArgs": "Samples\\GAME.BAS Samples\\GAME_CONVERTED.BAS"
+    }
+  }
+}

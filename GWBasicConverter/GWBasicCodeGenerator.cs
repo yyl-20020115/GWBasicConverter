@@ -471,7 +471,7 @@ public partial class GWBasicCodeGenerator
     public List<string> Parse(Stream stream, Encoding? encoding = null)
     {
         ArgumentNullException.ThrowIfNull(stream);
-        if (!stream.CanRead ||!stream.CanSeek) throw new ArgumentException(nameof(stream));
+        if (!stream.CanRead ||!stream.CanSeek) throw new ArgumentException(null, nameof(stream));
         stream.Seek(0, SeekOrigin.Begin);
         long len = stream.Length;
         if (len>=int.MaxValue) throw new ArgumentOutOfRangeException(nameof(stream));

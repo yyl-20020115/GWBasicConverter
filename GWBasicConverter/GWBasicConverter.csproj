@@ -9,6 +9,30 @@
 
   <ItemGroup>
     <None Remove="Samples\CODEPAGE.BAS" />
+    <None Remove="Samples\DOS1.25\ART.BAS" />
+    <None Remove="Samples\DOS1.25\ART_Converted.BAS" />
+    <None Remove="Samples\DOS1.25\BALL.BAS" />
+    <None Remove="Samples\DOS1.25\BALL_Converted.BAS" />
+    <None Remove="Samples\DOS1.25\CALENDAR.BAS" />
+    <None Remove="Samples\DOS1.25\CALENDAR_Converted.BAS" />
+    <None Remove="Samples\DOS1.25\CIRCLE.BAS" />
+    <None Remove="Samples\DOS1.25\CIRCLE_Converted.BAS" />
+    <None Remove="Samples\DOS1.25\COLORBAR.BAS" />
+    <None Remove="Samples\DOS1.25\COLORBAR_Converted.BAS" />
+    <None Remove="Samples\DOS1.25\COMM.BAS" />
+    <None Remove="Samples\DOS1.25\COMM_Converted.BAS" />
+    <None Remove="Samples\DOS1.25\DONKEY.BAS" />
+    <None Remove="Samples\DOS1.25\DONKEY_Converted.BAS" />
+    <None Remove="Samples\DOS1.25\MORTGAGE.BAS" />
+    <None Remove="Samples\DOS1.25\MORTGAGE_Converted.BAS" />
+    <None Remove="Samples\DOS1.25\MUSIC.BAS" />
+    <None Remove="Samples\DOS1.25\MUSIC_Converted.BAS" />
+    <None Remove="Samples\DOS1.25\PIECHART.BAS" />
+    <None Remove="Samples\DOS1.25\PIECHART_Converted.BAS" />
+    <None Remove="Samples\DOS1.25\SAMPLES.BAS" />
+    <None Remove="Samples\DOS1.25\SAMPLES_Converted.BAS" />
+    <None Remove="Samples\DOS1.25\SPACE.BAS" />
+    <None Remove="Samples\DOS1.25\SPACE_Converted.BAS" />
     <None Remove="Samples\GAME.BAS" />
     <None Remove="Samples\TYPEDEMO.BAS" />
   </ItemGroup>
@@ -17,16 +41,84 @@
     <EmbeddedResource Include="Samples\CODEPAGE.BAS">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\ART.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\ART_Converted.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\BALL.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\BALL_Converted.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\CALENDAR.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\CALENDAR_Converted.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\CIRCLE.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\CIRCLE_Converted.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\COLORBAR.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\COLORBAR_Converted.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\COMM.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\COMM_Converted.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\DONKEY.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\DONKEY_Converted.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\MORTGAGE.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\MORTGAGE_Converted.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\MUSIC.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\MUSIC_Converted.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\PIECHART.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\PIECHART_Converted.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\SAMPLES.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\SAMPLES_Converted.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\SPACE.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\DOS1.25\SPACE_Converted.BAS">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Samples\GAME.BAS">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Samples\TYPEDEMO.BAS">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Samples\DOS1.25\" />
   </ItemGroup>
 
 </Project>

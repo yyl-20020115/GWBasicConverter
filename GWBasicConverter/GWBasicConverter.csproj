@@ -25,4 +25,8 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Samples\DOS1.25\" />
+  </ItemGroup>
+
 </Project>

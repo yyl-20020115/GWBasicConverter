@@ -2,7 +2,8 @@
   "profiles": {
     "GWBasicConverter": {
       "commandName": "Project",
-      "commandLineArgs": "Samples\\GAME.BAS Samples\\GAME_CONVERTED.BAS"
+      "commandLineArgs": "Samples\\DOS1.25 Samples\\DOS1.25",
+      "workingDirectory": "$(ProjectDir)"
     }
   }
 }

@@ -411,7 +411,6 @@ public partial class GWBasicCodeGenerator
             {
                 CheckBoundary(lines, data, pos, 2);
                 var si = BitConverter.ToInt16(data, pos + 1);
-
                 EnsureBufferSaved(builder, buffer, encoding);
                 builder.Append(si);
 

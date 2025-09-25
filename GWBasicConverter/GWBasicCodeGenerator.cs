@@ -281,8 +281,10 @@ public partial class GWBasicCodeGenerator
             };
         }
     }
-    protected static string DecodeText(byte[] buffer, Encoding encoding) => encoding.GetString(buffer);
-    protected static string DecodeText(List<byte> buffer, Encoding encoding) => DecodeText(buffer.ToArray(), encoding);
+    protected static string DecodeText(byte[] buffer, Encoding encoding) 
+        => encoding.GetString(buffer);
+    protected static string DecodeText(List<byte> buffer, Encoding encoding) 
+        => DecodeText(buffer.ToArray(), encoding);
     protected static void EnsureBufferSaved(StringBuilder builder, List<byte> buffer, Encoding encoding)
     {
         if (buffer.Count > 0)
@@ -316,146 +318,164 @@ public partial class GWBasicCodeGenerator
             CheckBoundary(lines, data, pos, 1);
             var code = data[pos];
             var ext = (((int)code)<<8) | data[pos + 1];
-            if (code == 0x22 && !isRemming)
+            switch (code)
             {
-                // There was no quote escaping. You had to use CHR$() to
-                // output a quote character.
-                isQuoting = !isQuoting;
-                EnsureBufferSaved(builder, buffer, encoding);
-                builder.Append('"');
-                pos++;
-            }
-            else if (code == 0x3a 
-                && !(isQuoting || isRemming) 
-                && data.Length - pos - 1 > 2
-                && data[pos + 1] == 0x8f 
-                && data[pos + 2] == 0xd9)
-            {
-                // REM block starts
-                // A single quote is an alias for a REM instruction
-                // It is stored with 3 bytes: 0x3a8fd9
-                isRemming = true;    // a REM block never ends (inside a line)
-                EnsureBufferSaved(builder, buffer, encoding);
-                builder.Append('\'');
-                pos += 3;
-            }
-            else if ((code >= 0x20 && code <= 0x7e) || isQuoting || isRemming)
-            {
-                buffer.Add(code);//save bytes for decoding
-                pos++;
-            }
-            else if (code == 0x8f)
-            {
-                // REM block starts
-                isRemming = true; // a REM block never ends (inside a line)
-                EnsureBufferSaved(builder, buffer, encoding);
-                builder.Append("REM");
-                pos++;
-            }
-            else if (code == 0x0b) //octal constant
-            {
-                //Signed, but that's not visible in octal representation
-                CheckBoundary(lines, data, pos, 2);
-                List<string> os = [];
-                var oct = BitConverter.ToUInt16(data, pos + 1);
-                while (oct > 0)
-                {
-                    os.Add((oct & 0x07).ToString());
-                    oct >>= 3;
-                }
-                if (os.Count == 0) os.Add("0");
-                os.Reverse();
-                EnsureBufferSaved(builder, buffer, encoding);
-                builder.Append(os.Aggregate("&0", (a, b) => a + b));
-                pos += 3;
-            }
-            else if (code == 0x0c) //hex constant
-            {
-                //signed, but that's not visible in hexa representation
-                CheckBoundary(lines, data, pos, 2);
-                var hex = BitConverter.ToUInt16(data, pos + 1);
-                EnsureBufferSaved(builder, buffer, encoding);
-                builder.AppendFormat("&H{0:X}", hex);
-                pos += 3;
-            }
-            else if (code == 0x0d) // line pointer (unsigned)
-            {
-                throw new InvalidDataException(
-                    "line pointer (0x0d) shouldn't occur in saved program.");
-            }
-            else if (code == 0x0e) // line number (unsigned)
-            {
-                CheckBoundary(lines, data, pos, 2);
-                var lineNumber = BitConverter.ToUInt16(data, pos + 1);
-                EnsureBufferSaved(builder, buffer, encoding);
-                builder.AppendFormat("{0} ", lineNumber);
-                pos += 3;
-            }
-            else if (code == 0x0f) //one byte constant
-            {
-                EnsureBufferSaved(builder, buffer, encoding);
-                builder.AppendFormat("{0}", data[pos + 1]);
-                pos += 2;
-            }
-            else if (code == 0x10) //Flags constant (unused)
-            {
-                throw new InvalidDataException("unexpected 0x10 token");
-            }
-            else if (code >= 0x11 && code <= 0x1b) // Numbers from 0 to 10 have their own tokens
-            {
-                EnsureBufferSaved(builder, buffer, encoding);
-                builder.AppendFormat("{0}", code - 0x11);
-                pos++;
-            }
-            else if (code == 0x1c) //two byte integer constant (signed)
-            {
-                CheckBoundary(lines, data, pos, 2);
-                var si = BitConverter.ToInt16(data, pos + 1);
-                EnsureBufferSaved(builder, buffer, encoding);
-                builder.Append(si);
+                case 0x22 when !isRemming:
+                    // There was no quote escaping. You had to use CHR$() to
+                    // output a quote character.
+                    isQuoting = !isQuoting;
+                    EnsureBufferSaved(builder, buffer, encoding);
+                    builder.Append('"');
+                    pos++;
+                    break;
+                case 0x3a when !(isQuoting || isRemming)
+                    && data.Length - pos - 1 > 2
+                    && data[pos + 1] == 0x8f
+                    && data[pos + 2] == 0xd9:
+                    // REM block starts
+                    // A single quote is an alias for a REM instruction
+                    // It is stored with 3 bytes: 0x3a8fd9
+                    isRemming = true;    // a REM block never ends (inside a line)
+                    EnsureBufferSaved(builder, buffer, encoding);
+                    builder.Append('\'');
+                    pos += 3;
+                    break;
+                default:
+                    {
+                        if ((code >= 0x20 && code <= 0x7e) || isQuoting || isRemming)
+                        {
+                            buffer.Add(code);//save bytes for decoding
+                            pos++;
+                        }
+                        else
+                        {
+                            switch (code)
+                            {
+                                case 0x8f:
+                                    // REM block starts
+                                    isRemming = true; // a REM block never ends (inside a line)
+                                    EnsureBufferSaved(builder, buffer, encoding);
+                                    builder.Append("REM");
+                                    pos++;
+                                    break;
+                                case 0x0b:
+                                    {
+                                        //Signed, but that's not visible in octal representation
+                                        CheckBoundary(lines, data, pos, 2);
+                                        List<string> os = [];
+                                        var oct = BitConverter.ToUInt16(data, pos + 1);
+                                        while (oct > 0)
+                                        {
+                                            os.Add((oct & 0x07).ToString());
+                                            oct >>= 3;
+                                        }
+                                        if (os.Count == 0) os.Add("0");
+                                        os.Reverse();
+                                        EnsureBufferSaved(builder, buffer, encoding);
+                                        builder.Append(os.Aggregate("&0", (a, b) => a + b));
+                                        pos += 3;
+                                        break;
+                                    }
 
-                pos += 3;
-            }
-            else if (code == 0x1d) //four byte floating point constant
-            {
-                CheckBoundary(lines, data, pos, 4);
-                var si = ParseFloat32(data, pos + 1);
+                                case 0x0c:
+                                    {
+                                        //signed, but that's not visible in hexa representation
+                                        CheckBoundary(lines, data, pos, 2);
+                                        var hex = BitConverter.ToUInt16(data, pos + 1);
+                                        EnsureBufferSaved(builder, buffer, encoding);
+                                        builder.AppendFormat("&H{0:X}", hex);
+                                        pos += 3;
+                                        break;
+                                    }
 
-                EnsureBufferSaved(builder, buffer, encoding);
-                builder.Append(si);
+                                case 0x0d:
+                                    throw new InvalidDataException(
+                                                                    "line pointer (0x0d) shouldn't occur in saved program.");
+                                case 0x0e:
+                                    {
+                                        CheckBoundary(lines, data, pos, 2);
+                                        var lineNumber = BitConverter.ToUInt16(data, pos + 1);
+                                        EnsureBufferSaved(builder, buffer, encoding);
+                                        builder.AppendFormat("{0} ", lineNumber);
+                                        pos += 3;
+                                        break;
+                                    }
 
-                pos += 5;
-            }
-            else if (code == 0x1e) //unused
-            {
-                throw new InvalidDataException("unexpected 0x1e token");
-            }
-            else if (code == 0x1f) //eight byte double value
-            {
-                CheckBoundary(lines, data, pos, 8);
-                var si = ParseFloat64(data, pos + 1);
+                                case 0x0f:
+                                    EnsureBufferSaved(builder, buffer, encoding);
+                                    builder.AppendFormat("{0}", data[pos + 1]);
+                                    pos += 2;
+                                    break;
+                                case 0x10:
+                                    throw new InvalidDataException("unexpected 0x10 token");
+                                case >= 0x11 and <= 0x1b:
+                                    EnsureBufferSaved(builder, buffer, encoding);
+                                    builder.AppendFormat("{0}", code - 0x11);
+                                    pos++;
+                                    break;
+                                case 0x1c:
+                                    {
+                                        CheckBoundary(lines, data, pos, 2);
+                                        var si = BitConverter.ToInt16(data, pos + 1);
+                                        EnsureBufferSaved(builder, buffer, encoding);
+                                        builder.Append(si);
 
-                EnsureBufferSaved(builder, buffer, encoding);
-                builder.Append(si);
+                                        pos += 3;
+                                        break;
+                                    }
 
-                pos += 9;
-            }
-            else if (Tokens.ContainsKey(code)) //1-byte tokens
-            {
-                EnsureBufferSaved(builder, buffer, encoding);
-                builder.Append(Tokens[code]);
-                pos++;
-            }
-            else if (Tokens.TryGetValue(ext, out string? value)) //2-byte tokens
-            {
-                //The boundary for that +1 is already checked at the beginning of the loop.
-                EnsureBufferSaved(builder, buffer, encoding);
-                builder.Append(value);
-                pos += 2;
-            }
-            else
-            {                    
-                throw new InvalidDataException("unexpected token: " + code);
+                                case 0x1d:
+                                    {
+                                        CheckBoundary(lines, data, pos, 4);
+                                        var si = ParseFloat32(data, pos + 1);
+
+                                        EnsureBufferSaved(builder, buffer, encoding);
+                                        builder.Append(si);
+
+                                        pos += 5;
+                                        break;
+                                    }
+
+                                case 0x1e:
+                                    throw new InvalidDataException("unexpected 0x1e token");
+                                case 0x1f:
+                                    {
+                                        CheckBoundary(lines, data, pos, 8);
+                                        var si = ParseFloat64(data, pos + 1);
+
+                                        EnsureBufferSaved(builder, buffer, encoding);
+                                        builder.Append(si);
+
+                                        pos += 9;
+                                        break;
+                                    }
+
+                                default:
+                                    {
+                                        if (Tokens.ContainsKey(code)) //1-byte tokens
+                                        {
+                                            EnsureBufferSaved(builder, buffer, encoding);
+                                            builder.Append(Tokens[code]);
+                                            pos++;
+                                        }
+                                        else if (Tokens.TryGetValue(ext, out string? value)) //2-byte tokens
+                                        {
+                                            //The boundary for that +1 is already checked at the beginning of the loop.
+                                            EnsureBufferSaved(builder, buffer, encoding);
+                                            builder.Append(value);
+                                            pos += 2;
+                                        }
+                                        else
+                                        {
+                                            throw new InvalidDataException("unexpected token: " + code);
+                                        }
+
+                                        break;
+                                    }
+                            }
+                        }
+                    }
+                    break;
             }
         }
         pos++;

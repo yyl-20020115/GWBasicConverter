@@ -2,7 +2,7 @@
   "profiles": {
     "GWBasicConverter": {
       "commandName": "Project",
-      "commandLineArgs": "Samples\\DOS1.25 Samples\\DOS1.25",
+      "commandLineArgs": "D:\\Working\\MS-DOS\\v2.0\\SOURCE D:\\Working\\MS-DOS\\v2.0\\SOURCE\\ASC-BAS",
       "workingDirectory": "$(ProjectDir)"
     }
   }

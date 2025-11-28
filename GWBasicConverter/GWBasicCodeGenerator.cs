@@ -222,7 +222,7 @@ public partial class GWBasicCodeGenerator
 
     // Float binary format: http://www.chebucto.ns.ca/~af380/GW-BASIC-tokens.html
     // Rounding and postfixes: https://www-user.tu-chemnitz.de/~heha/viewchm.php/hs/gwBasic.chm/Chapter6.html
-    protected static string ParseFloat32(byte[] data,int pos)
+    protected static string ParseFloat32(byte[] data, int pos)
     {
         if (data[pos + 3] == 0) return "0";
         var exp = data[pos + 3] - 152;// -152 = -128 + -24 (24 because the significand is behind a decimal dot)
@@ -232,7 +232,7 @@ public partial class GWBasicCodeGenerator
         // Must round to 6 significant figures (from 7) when displaying
         var ns = CanonizeNumber($"{nf:0.000000}");
         //If nothing indicates that this is a float, then add the "!" postfix
-        if (ns.IndexOfAny(['.', 'E']) <0)
+        if (ns.IndexOfAny(['.', 'E']) < 0)
             ns += '!';
         return ns;
     }
@@ -242,23 +242,23 @@ public partial class GWBasicCodeGenerator
     {
         if (data[pos + 7] == 0) return "0";
         var exp = data[pos + 7] - 184;// -184 = -128 + -56 (56 because the significand is behind a decimal dot)
-        var mantissa 
-            = (((long)(data[pos + 6] | 0x80)) << 48) 
-            | (((long)data[pos + 5]) << 40) 
+        var mantissa
+            = (((long)(data[pos + 6] | 0x80)) << 48)
+            | (((long)data[pos + 5]) << 40)
             | (((long)data[pos + 4]) << 32)
-            | (((long)data[pos + 3]) << 24) 
-            | (((long)data[pos + 2]) << 16) 
-            | (((long)data[pos + 1]) << 8) 
+            | (((long)data[pos + 3]) << 24)
+            | (((long)data[pos + 2]) << 16)
+            | (((long)data[pos + 1]) << 8)
             | data[pos];
 
         // We must always output a positive number for doubles,
         // because a token for '-' is already added before the negative ones.
 
-        var nf = mantissa * Math.Pow(2.0,exp);
+        var nf = mantissa * Math.Pow(2.0, exp);
 
         // Must round to 16 significant figures (from 17) when displaying
         // The exponent sign for doubles is 'D' instead of 'E'
-        var ns = CanonizeNumber($"{nf:0.0000000000000000}").Replace('E','D');
+        var ns = CanonizeNumber($"{nf:0.0000000000000000}").Replace('E', 'D');
 
         // Doubles only get their postfix '#' when they don't contain the exponentiation letter 'D'
         if (ns.IndexOf('D') < 0)
@@ -270,7 +270,7 @@ public partial class GWBasicCodeGenerator
         => string.IsNullOrEmpty(s) ? s : s.ToUpper();
     //s = Canon1.Replace(s, @"\1.");//s = Canon2.Replace(s, string.Empty);
 
-    protected static void CheckBoundary(List<string> lines,byte[] data, int pos,int required)
+    protected static void CheckBoundary(List<string> lines, byte[] data, int pos, int required)
     {
         if (data.Length - pos - 1 < required)
         {
@@ -281,9 +281,9 @@ public partial class GWBasicCodeGenerator
             };
         }
     }
-    protected static string DecodeText(byte[] buffer, Encoding encoding) 
+    protected static string DecodeText(byte[] buffer, Encoding encoding)
         => encoding.GetString(buffer);
-    protected static string DecodeText(List<byte> buffer, Encoding encoding) 
+    protected static string DecodeText(List<byte> buffer, Encoding encoding)
         => DecodeText(buffer.ToArray(), encoding);
     protected static void EnsureBufferSaved(StringBuilder builder, List<byte> buffer, Encoding encoding)
     {
@@ -293,13 +293,13 @@ public partial class GWBasicCodeGenerator
             buffer.Clear();
         }
     }
-    protected static int ParseLine(List<string> lines,byte[] data,int pos, Encoding encoding)
+    protected static int ParseLine(List<string> lines, byte[] data, int pos, Encoding encoding)
     {
         CheckBoundary(lines, data, pos, 2);
 
-        if (data[pos + 0] == 0 && data[pos + 1] == 0) return -1;
+        if (data[pos + 0] == 0 && data[pos + 1] == 0) 
+            return -1;
         var o = pos;
-
         pos += 2;
         CheckBoundary(lines, data, pos, 2);
 
@@ -308,8 +308,8 @@ public partial class GWBasicCodeGenerator
         var builder = new StringBuilder();
         var buffer = new List<byte>();
         var ln = BitConverter.ToUInt16(data, pos);
-
-        builder.Append($"{ln}\t");
+        //line number
+        builder.Append($"{ln} ");
 
         pos += 2;
 
@@ -317,7 +317,7 @@ public partial class GWBasicCodeGenerator
         {
             CheckBoundary(lines, data, pos, 1);
             var code = data[pos];
-            var ext = (((int)code)<<8) | data[pos + 1];
+            var ext = (((int)code) << 8) | data[pos + 1];
             switch (code)
             {
                 case 0x22 when !isRemming:
@@ -389,8 +389,7 @@ public partial class GWBasicCodeGenerator
                                     }
 
                                 case 0x0d:
-                                    throw new InvalidDataException(
-                                                                    "line pointer (0x0d) shouldn't occur in saved program.");
+                                    throw new InvalidDataException("line pointer (0x0d) shouldn't occur in saved program.");
                                 case 0x0e:
                                     {
                                         CheckBoundary(lines, data, pos, 2);
@@ -467,7 +466,8 @@ public partial class GWBasicCodeGenerator
                                         }
                                         else
                                         {
-                                            throw new InvalidDataException("unexpected token: " + code);
+                                            throw new InvalidDataException(
+                                                "unexpected token: " + code);
                                         }
 
                                         break;
@@ -490,23 +490,23 @@ public partial class GWBasicCodeGenerator
     public List<string> Parse(Stream stream, Encoding? encoding = null)
     {
         ArgumentNullException.ThrowIfNull(stream);
-        if (!stream.CanRead ||!stream.CanSeek) throw new ArgumentException(null, nameof(stream));
+        if (!stream.CanRead || !stream.CanSeek) throw new ArgumentException(null, nameof(stream));
         stream.Seek(0, SeekOrigin.Begin);
         long len = stream.Length;
-        if (len>=int.MaxValue) throw new ArgumentOutOfRangeException(nameof(stream));
+        if (len >= int.MaxValue) throw new ArgumentOutOfRangeException(nameof(stream));
         var data = new byte[len];
         int r = stream.Read(data, 0, (int)len);
-        
-        return this.Parse(data, encoding);
+
+        return r > 0 ? this.Parse(data, encoding) : [];
     }
     public List<string> Parse(byte[] data, Encoding? encoding = null)
     {
         encoding ??= Encoding.Default;
-        var lines = new List<string>();
         ArgumentNullException.ThrowIfNull(data);
         if (data.Length == 0)
         {
             //OK    
+            return [];
         }
         else if (data[0] != MagicByte)
         {
@@ -514,6 +514,7 @@ public partial class GWBasicCodeGenerator
         }
         else //
         {
+            var lines = new List<string>();
             var pos = 1;
             while (pos < data.Length - 1)
             {
@@ -521,9 +522,8 @@ public partial class GWBasicCodeGenerator
                 if (delta < 0) break;
                 pos += delta;
             }
+            return lines;
         }
-        
-        return lines;
     }
 
     [GeneratedRegex(@"^([\-])*0\.")]

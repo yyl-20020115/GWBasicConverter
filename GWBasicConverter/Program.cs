@@ -36,7 +36,7 @@ public class Program
                         && buffer[0]== GWBasicCodeGenerator.MagicByte)
                     {
                         var name = Path.GetFileNameWithoutExtension(file);
-                        Convert(file, Path.Combine(dst, $"{name}_Converted.BAS"));
+                        Convert(file, Path.Combine(dst, $"{name}.BAS"));
                     }
                     else
                     {
